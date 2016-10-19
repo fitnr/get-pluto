@@ -25,10 +25,11 @@ This will download the PLUTO data and merge borough files into citywide files. I
 
 To download only some releases, use the `versions` variable, e.g:
 ```
-make versions="15v1 02b"
+make versions=16v1
+make versions="12v2 02b"
 ```
 
-Available versions on the DCP website: 15v1, 14v2, 14v1, 13v2, 13v1, 12v2, 12v1, 11v2, 11v1, 10v2, 10v1, 09v2, 09v1, 07c, 06c, 05d, 04c, 20b.     
+Available versions on the DCP website: 16v1, 15v1, 14v2, 14v1, 13v2, 13v1, 12v2, 12v1, 11v2, 11v1, 10v2, 10v1, 09v2, 09v1, 07c, 06c, 05d, 04c, 02b.     
 
 ## Summaries
 

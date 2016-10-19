@@ -144,7 +144,8 @@ pluto_summary_02 = CAST(CAST(BoroCode as INTEGER) AS TEXT) || substr('00' || CAS
 	$(YearBuilt_summary), \
 	$(Dims_summary)
 
-versions = 15v1 \
+versions = 16v1 \
+	15v1 \
 	14v2 14v1 \
 	13v2 13v1 \
 	12v2 12v1 \
@@ -247,7 +248,7 @@ lowercase_folders = Bronx/bxmappluto.shp \
 
 no_space_folders = $(subst Staten_Island,Staten Island,$(lowercase_folders))
 
-no_parent = 09v1 10v1 12v1 14v1 14v2 15v1
+no_parent = 09v1 10v1 12v1 14v1 14v2 15v1 16v1
 
 lowercases = 06c 05d 03c
 

@@ -144,7 +144,7 @@ pluto_summary_02 = CAST(CAST(BoroCode as INTEGER) AS TEXT) || substr('00' || CAS
 	$(YearBuilt_summary), \
 	$(Dims_summary)
 
-versions = 16v1 \
+versions = 16v2 16v1 \
 	15v1 \
 	14v2 14v1 \
 	13v2 13v1 \
@@ -246,6 +246,10 @@ lowercase_folders = Bronx/bxmappluto.shp \
 	Queens/qnmappluto.shp \
 	Staten_Island/simappluto.shp
 
+nestzips_16v2 = $(addsuffix 16V2.zip,Bronx Brooklyn Manhattan Queens StatenIsland)
+
+nestedzips = 16v2
+
 no_space_folders = $(subst Staten_Island,Staten Island,$(lowercase_folders))
 
 no_parent = 09v1 10v1 12v1 14v1 14v2 15v1 16v1
@@ -265,7 +269,17 @@ $(addsuffix .ind,$(call PLUTO,$(versions))): %.ind: %.shp
 	-ogrinfo $< -sql 'CREATE INDEX ON "$(basename $(<F))" USING Block'
 	-ogrinfo $< -sql 'CREATE INDEX ON "$(basename $(<F))" USING Lot'
 
-$(addsuffix .shp,$(call PLUTO,$(filter-out $(specials) $(lowercases) $(no_parent),$(versions)))): %.shp: %.zip
+$(addsuffix .shp,$(call PLUTO,16v2)): $(addprefix pluto_16v2/,$(nestzips_16v2))
+	@rm -f $(basename $@).{dbf,shp}
+	for f in $(basename $(^F)); do \
+		ogr2ogr $@ /vsizip/$(<D)/$${f}.zip/$$(unzip -qq -l $(<D)/$${f}.zip '*PLUTO.shp' | grep -oE '[^ ]+$$') \
+			-f 'ESRI Shapefile' -update -append; \
+	done;
+
+$(addprefix pluto_16v2/,$(nestzips_16v2)): $(call PLUTO,16v2).zip
+	unzip -jud $(@D) $< $(@F)
+
+$(addsuffix .shp,$(call PLUTO,$(filter-out $(specials) $(lowercases) $(no_parent) $(nestedzips),$(versions)))): %.shp: %.zip
 	$(call MERGE,$(folders),$(PARENT)/)
 
 $(addsuffix .shp,$(call PLUTO,$(no_parent))): %.shp: %.zip

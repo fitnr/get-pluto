@@ -258,38 +258,38 @@ lowercases = 06c 05d 03c
 
 specials = 02b 04c
 
-MERGE = @rm -f $(basename $@).{dbf,shp}; \
-	$(foreach shp,$(1),\
-		ogr2ogr -f 'ESRI Shapefile' -update -append $@ /vsizip/$</$(2)$(shp); \
-	)
+PREREQUISITES = $(foreach x,$(1),/vsizip/$</$(2)$(x))
+
+# nested zips are annoying!
+Bronx16V2.zip = BXMapPLUTO
+Brooklyn16V2.zip = BKMapPLUTO
+Manhattan16V2.zip = MNMapPLUTO
+Queens16V2.zip = QNMapPLUTO
+StatenIsland16V2.zip = SIMapPLUTO
 
 $(addsuffix .ind,$(call PLUTO,$(versions))): %.ind: %.shp
 	@rm -f $(basename $@).{ind,idm}
-	-ogrinfo $< -sql 'CREATE INDEX ON "$(basename $(<F))" USING BoroCode'
-	-ogrinfo $< -sql 'CREATE INDEX ON "$(basename $(<F))" USING Block'
-	-ogrinfo $< -sql 'CREATE INDEX ON "$(basename $(<F))" USING Lot'
+	-ogrinfo $< -sql 'CREATE INDEX ON "$(basename $(<F))" USING BBL'
 
 $(addsuffix .shp,$(call PLUTO,16v2)): $(addprefix pluto_16v2/,$(nestzips_16v2))
 	@rm -f $(basename $@).{dbf,shp}
-	for f in $(basename $(^F)); do \
-		ogr2ogr $@ /vsizip/$(<D)/$${f}.zip/$$(unzip -qq -l $(<D)/$${f}.zip '*PLUTO.shp' | grep -oE '[^ ]+$$') \
-			-f 'ESRI Shapefile' -update -append; \
-	done;
+	ogrmerge.py -f 'ESRI Shapefile' -overwrite_ds -lco RESIZE=YES -single -o $@ $(foreach f,$(^F),/vsizip/$(<D)/$f/$($f).shp)
 
 $(addprefix pluto_16v2/,$(nestzips_16v2)): $(call PLUTO,16v2).zip
 	unzip -jud $(@D) $< $(@F)
+	@touch $@
 
 $(addsuffix .shp,$(call PLUTO,$(filter-out $(specials) $(lowercases) $(no_parent) $(nestedzips),$(versions)))): %.shp: %.zip
-	$(call MERGE,$(folders),$(PARENT)/)
+	ogrmerge.py -f 'ESRI Shapefile' -overwrite_ds -lco RESIZE=YES -single -o $@ $(call PREREQUISITES,$(folders),$(PARENT)/)
 
 $(addsuffix .shp,$(call PLUTO,$(no_parent))): %.shp: %.zip
-	$(call MERGE,$(folders))
+	ogrmerge.py -f 'ESRI Shapefile' -overwrite_ds -lco RESIZE=YES -single $(call PREREQUISITES,$(folders))
 
 $(addsuffix .shp,$(call PLUTO,$(lowercases))): %.shp: %.zip
-	$(call MERGE,$(lowercase_folders),$(PARENT)/)
+	ogrmerge.py -f 'ESRI Shapefile' -overwrite_ds -lco RESIZE=YES -single $(call PREREQUISITES,$(lowercase_folders),$(PARENT)/)
 
 $(addsuffix .shp,$(call PLUTO,04c)): %.shp: %.zip
-	$(call MERGE,$(no_space_folders),$(PARENT)/)
+	ogrmerge.py -f 'ESRI Shapefile' -overwrite_ds -lco RESIZE=YES -single $(call PREREQUISITES,$(no_space_folders),$(PARENT)/)
 
 # 02b has NULL borocode for SI. WTF
 $(addsuffix .shp,$(call PLUTO,02b)): %.shp: %.zip

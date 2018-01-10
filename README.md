@@ -13,9 +13,8 @@ Also included are tasks to create block- and community-district-level summaries.
 
 ## Requires
 
-Downloading the data only requires `curl`, creating citywide files and block-level summaries requires:
-
-* [GDAL](http://www.gdal.org) - specifically `ogr2ogr`
+* `curl` (downloading data)
+* [GDAL](http://www.gdal.org) v 2.2+ (creating citywide files and block-level summaries)
 
 ## Basics
 ```

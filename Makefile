@@ -283,13 +283,13 @@ $(addsuffix .shp,$(call PLUTO,$(filter-out $(specials) $(lowercases) $(no_parent
 	ogrmerge.py -f 'ESRI Shapefile' -overwrite_ds -lco RESIZE=YES -single -o $@ $(call PREREQUISITES,$(folders),$(PARENT)/)
 
 $(addsuffix .shp,$(call PLUTO,$(no_parent))): %.shp: %.zip
-	ogrmerge.py -f 'ESRI Shapefile' -overwrite_ds -lco RESIZE=YES -single $(call PREREQUISITES,$(folders))
+	ogrmerge.py -f 'ESRI Shapefile' -overwrite_ds -lco RESIZE=YES -single -o $@ $(call PREREQUISITES,$(folders))
 
 $(addsuffix .shp,$(call PLUTO,$(lowercases))): %.shp: %.zip
-	ogrmerge.py -f 'ESRI Shapefile' -overwrite_ds -lco RESIZE=YES -single $(call PREREQUISITES,$(lowercase_folders),$(PARENT)/)
+	ogrmerge.py -f 'ESRI Shapefile' -overwrite_ds -lco RESIZE=YES -single -o $@ $(call PREREQUISITES,$(lowercase_folders),$(PARENT)/)
 
 $(addsuffix .shp,$(call PLUTO,04c)): %.shp: %.zip
-	ogrmerge.py -f 'ESRI Shapefile' -overwrite_ds -lco RESIZE=YES -single $(call PREREQUISITES,$(no_space_folders),$(PARENT)/)
+	ogrmerge.py -f 'ESRI Shapefile' -overwrite_ds -lco RESIZE=YES -single -o $@ $(call PREREQUISITES,$(no_space_folders),$(PARENT)/)
 
 # 02b has NULL borocode for SI. WTF
 $(addsuffix .shp,$(call PLUTO,02b)): %.shp: %.zip
